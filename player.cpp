@@ -5,7 +5,8 @@
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish
  * within 30 seconds.
  */
-Player::Player(Side side) {
+Player::Player(Side side)
+{
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
@@ -19,7 +20,8 @@ Player::Player(Side side) {
 /*
  * Destructor for the player.
  */
-Player::~Player() {
+Player::~Player()
+{
 }
 
 /*
@@ -35,7 +37,8 @@ Player::~Player() {
  * The move returned must be legal; if there are no valid moves for your side,
  * return nullptr.
  */
-Move *Player::doMove(Move *opponentsMove, int msLeft) {
+Move *Player::doMove(Move *opponentsMove, int msLeft)
+{
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
