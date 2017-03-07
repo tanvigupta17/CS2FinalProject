@@ -10,11 +10,17 @@ Player::Player(Side side)
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
-    /*
-     * TODO: Do any initialization you need to do here (setting up the board,
-     * precalculating things, etc.) However, remember that you will only have
-     * 30 seconds.
-     */
+    // Set up a copy of the board
+    aiBoard = aiBoard->copy();
+
+    // Set the AI's side
+    aiSide = side;
+
+    // Compute opponent's side
+    if (aiSide == BLACK)
+        opponentsSide = WHITE;
+    else
+        opponentsSide = BLACK;
 }
 
 /*
@@ -39,9 +45,34 @@ Player::~Player()
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft)
 {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
+    Move *move;
+
+    // Simplest possible move - random choice
+    move = doRandomMove(opponentsMove, msLeft);
+
+    // Beat SimplePlayer - use heuristics
+
+
+    return move;
+}
+
+Move *Player::doRandomMove(Move *opponentsMove, int msLeft)
+{
+    // Populate board with opponent's move
+    aiBoard->doMove(opponentsMove, opponentsSide);
+
+    // Calculate the simplest possible valid move - choose randomly
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            Move move(i, j);
+            if (aiBoard->checkMove(&move, aiSide))
+            {
+                aiBoard->doMove(&move, aiSide);
+                return &move;
+            }
+        }
+    }
     return nullptr;
 }
