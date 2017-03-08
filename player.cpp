@@ -11,7 +11,7 @@ Player::Player(Side side)
     testingMinimax = false;
 
     // Set up a copy of the board
-    aiBoard = aiBoard->copy();
+    aiBoard = new Board();
 
     // Set the AI's side
     aiSide = side;
@@ -28,6 +28,7 @@ Player::Player(Side side)
  */
 Player::~Player()
 {
+    delete aiBoard;
 }
 
 /*
@@ -51,11 +52,16 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     move = doRandomMove(opponentsMove, msLeft);
 
     // Beat SimplePlayer - use heuristics
-
+    // move = doHeuristicMove(opponentsMove, msLeft);
 
     return move;
 }
 
+/*
+ * Compute AI's next move given opponent's move
+ * Move is computed in simplest possible way - random one picked
+ *
+ */
 Move *Player::doRandomMove(Move *opponentsMove, int msLeft)
 {
     // Populate board with opponent's move
@@ -66,13 +72,25 @@ Move *Player::doRandomMove(Move *opponentsMove, int msLeft)
     {
         for (int j = 0; j < 8; j++)
         {
-            Move move(i, j);
-            if (aiBoard->checkMove(&move, aiSide))
+            Move *move = new Move(i, j);
+            if (aiBoard->checkMove(move, aiSide))
             {
-                aiBoard->doMove(&move, aiSide);
-                return &move;
+                aiBoard->doMove(move, aiSide);
+                return move;
             }
         }
     }
+    return nullptr;
+}
+
+/*
+ * Compute AI's next move given opponent's last move
+ * Aim is to defeat player which plays random moves
+ * Use heuristic to determine where to play
+ */
+Move *Player::doHeuristicMove(Move *opponentsMove, int msLeft)
+{
+    aiBoard->doMove(opponentsMove, opponentsSide);
+
     return nullptr;
 }

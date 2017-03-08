@@ -14,11 +14,11 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
     Move *doRandomMove(Move *opponentsMove, int msLeft);
+    Move *doHeuristicMove(Move *opponentsMove, int msLeft);
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
 
-private:
     Board *aiBoard;
     Side aiSide;
     Side opponentsSide;
