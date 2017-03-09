@@ -221,15 +221,15 @@ int Board::getBestHeuristic(Move *move, Side side)
     int val = count(side) - count(other);
 
     if ((i == 0 || i == 7) && (j == 0 || j == 7))
-        return 3*val;
+        return 10*val;
     else if ((i == 1 || i == 6) && (j == 1 || j == 6))
-        return -3*val;
+        return 0*val;
     else if (((j == 0 || j == 7) && (i == 1 || i == 6)) ||
              ((i == 0 || i == 7) && (j == 1 || j == 6)))
-        return -1*val; 
+        return 2*val; 
     else if (i == 0 || i == 7 || j == 0 || j == 7)
-        return 1*val;
-    return 0;
+        return 8*val;
+    return 5;
 }
 
 int Board::getNaiveHeuristic(Move *move, Side side)

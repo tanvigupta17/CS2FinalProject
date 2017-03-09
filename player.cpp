@@ -145,13 +145,16 @@ Move *Player::doMinimaxMove(Move *opponentsMove, int msLeft)
     // Update disposable board to reflect current board state
     test = aiBoard->copy();
 
+    // Reset bestMove
+    bestMove = nullptr;
+
     // Populate board with opponent's move
     aiBoard->doMove(opponentsMove, opponentsSide);
 
     if (testingMinimax)
         score = naiveMinimax(opponentsMove, 2, opponentsSide);
     else
-        score = naiveMinimax(opponentsMove, 4, opponentsSide);
+        score = naiveMinimax(opponentsMove, 7, opponentsSide);
 
     if (bestMove != nullptr)
         aiBoard->doMove(bestMove, aiSide);
@@ -193,11 +196,14 @@ int Player::naiveMinimax(Move *move, int depth, Side side)
     for (unsigned int i = 0; i < possibles.size(); i++)
     {
         depth -= 1;
-        int score = -naiveMinimax(possibles[i], depth, side);
+        int score = -naiveMinimax(possibles[i], depth, side); //was side
         scores.push_back(score);
         alpha = max(alpha, score);
+
         test = originalTest;
     }
+
+    Move *oldBest = bestMove;
 
     for (unsigned int j = 0; j < scores.size(); j++)
     {
@@ -207,6 +213,9 @@ int Player::naiveMinimax(Move *move, int depth, Side side)
             break;
         }
     }
+
+    if (bestMove == oldBest)
+        bestMove = nullptr;
 
     return alpha;
 }
