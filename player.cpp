@@ -49,10 +49,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     Move *move;
 
     // Simplest possible move - random choice
-    move = doRandomMove(opponentsMove, msLeft);
+    // move = doRandomMove(opponentsMove, msLeft);
 
     // Beat SimplePlayer - use heuristics
-    // move = doHeuristicMove(opponentsMove, msLeft);
+    move = doHeuristicMove(opponentsMove, msLeft);
 
     return move;
 }
@@ -90,7 +90,37 @@ Move *Player::doRandomMove(Move *opponentsMove, int msLeft)
  */
 Move *Player::doHeuristicMove(Move *opponentsMove, int msLeft)
 {
+    // Populate board with opponent's move
     aiBoard->doMove(opponentsMove, opponentsSide);
 
-    return nullptr;
+    int x = -1;
+    int y = -1;
+    int tempValue;
+    int maxValue = -10;
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            Move *move = new Move(i, j);
+            if (aiBoard->checkMove(move, aiSide))
+            {
+                tempValue = aiBoard->getHeuristicValue(move);
+                if (tempValue > maxValue)
+                {
+                    x = move->getX();
+                    y = move->getY();
+                    maxValue = tempValue;
+                }
+            }
+        }
+    }
+
+    if (x == (-1) && y == (-1))
+        return nullptr;
+
+    Move *best = new Move(x, y);
+    aiBoard->doMove(best, aiSide);
+
+    return best;
 }

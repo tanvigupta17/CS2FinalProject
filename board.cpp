@@ -163,6 +163,47 @@ int Board::countWhite() {
 }
 
 /*
+ * Get vector of possible moves for given stone.
+ */
+std::vector<Move *> Board::possibleMoves(Side side)
+{
+    std::vector<Move *> moves;
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            Move *move = new Move(i, j);
+            if (checkMove(move, side))
+            {
+                moves.push_back(move);
+            }
+        }
+    }
+    return moves;
+}
+
+/*
+ * Get heuristic value of given board position to determine favorability.
+ */
+int Board::getHeuristicValue(Move *move)
+{
+    int i = move->getX();
+    int j = move->getY();
+
+    if ((i == 0 || i == 7) && (j == 0 || j == 7))
+        return 3;
+    else if ((i == 1 || i == 6) && (j == 1 || j == 6))
+        return -3;
+    else if (((j == 0 || j == 7) && (i == 1 || i == 6)) ||
+             ((i == 0 || i == 7) && (j == 1 || j == 6)))
+        return -1;
+    else if (i == 0 || i == 7 || j == 0 || j == 7)
+        return 1;
+    return 0;
+}
+
+/*
  * Sets the board state given an 8x8 char array where 'w' indicates a white
  * piece and 'b' indicates a black piece. Mainly for testing purposes.
  */
