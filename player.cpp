@@ -21,6 +21,10 @@ Player::Player(Side side)
         opponentsSide = WHITE;
     else
         opponentsSide = BLACK;
+
+    // Globals for minimax implementation
+    bestMove = nullptr;
+    test = aiBoard->copy();
 }
 
 /*
@@ -29,6 +33,7 @@ Player::Player(Side side)
 Player::~Player()
 {
     delete aiBoard;
+    delete test;
 }
 
 /*
@@ -52,7 +57,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     // move = doRandomMove(opponentsMove, msLeft);
 
     // Beat SimplePlayer - use heuristics
-    move = doHeuristicMove(opponentsMove, msLeft);
+    // move = doHeuristicMove(opponentsMove, msLeft);
+
+    // Further improve AI - use 2-ply minimax
+    move = doMinimaxMove(opponentsMove, msLeft);
 
     return move;
 }
@@ -96,7 +104,7 @@ Move *Player::doHeuristicMove(Move *opponentsMove, int msLeft)
     int x = -1;
     int y = -1;
     int tempValue;
-    int maxValue = -10;
+    int maxValue = INT_MIN;
 
     for (int i = 0; i < 8; i++)
     {
@@ -123,4 +131,82 @@ Move *Player::doHeuristicMove(Move *opponentsMove, int msLeft)
     aiBoard->doMove(best, aiSide);
 
     return best;
+}
+
+/*
+ * Compute best move given opponents move
+ * Use 2-ply minimax to predict game state two sets of moves ahead
+ * Pick move which leads to best final game state
+ */
+Move *Player::doMinimaxMove(Move *opponentsMove, int msLeft)
+{
+    int score;
+
+    // Update disposable board to reflect current board state
+    test = aiBoard->copy();
+
+    // Populate board with opponent's move
+    aiBoard->doMove(opponentsMove, opponentsSide);
+
+    if (testingMinimax)
+        score = naiveMinimax(opponentsMove, 2, opponentsSide);
+    else
+        score = naiveMinimax(opponentsMove, 4, opponentsSide);
+
+    if (bestMove != nullptr)
+        aiBoard->doMove(bestMove, aiSide);
+
+    return bestMove;
+}
+
+int Player::naiveMinimax(Move *move, int depth, Side side)
+{
+    // Make current move to test cases
+    test->doMove(move, side);
+
+    Board *originalTest = test;
+
+    // Base case for recursion - no possible moves or reached depth needed
+    if (test->isDone() || depth <= 0)
+    {
+        // Determine which heuristic to use
+        if (testingMinimax)
+            return test->getNaiveHeuristic(move, side);
+        else
+            return test->getBestHeuristic(move, side);
+    }
+
+    std::vector<int> scores;
+
+    int alpha = INT_MIN;
+
+    // Switch side
+    if (side == BLACK)
+        side = WHITE;
+    else
+        side = BLACK;
+
+    // Get possible moves for other player (side has been switched)
+    std::vector<Move *> possibles = test->possibleMoves(side);
+
+    // Find best move in possibles
+    for (unsigned int i = 0; i < possibles.size(); i++)
+    {
+        depth -= 1;
+        int score = -naiveMinimax(possibles[i], depth, side);
+        scores.push_back(score);
+        alpha = max(alpha, score);
+        test = originalTest;
+    }
+
+    for (unsigned int j = 0; j < scores.size(); j++)
+    {
+        if (scores[j] == alpha)
+        {
+            bestMove = possibles[j];
+            break;
+        }
+    }
+
+    return alpha;
 }

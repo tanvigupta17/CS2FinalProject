@@ -3,6 +3,7 @@
 
 #include <bitset>
 #include <vector>
+#include <cmath>
 #include "common.hpp"
 using namespace std;
 
@@ -31,6 +32,8 @@ public:
     int countWhite();
     std::vector<Move *> possibleMoves(Side side);
     int getHeuristicValue(Move *m);
+    int getBestHeuristic(Move *m, Side side);
+    int getNaiveHeuristic(Move *m, Side side);
 
     void setBoard(char data[]);
 };

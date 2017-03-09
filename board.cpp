@@ -203,6 +203,52 @@ int Board::getHeuristicValue(Move *move)
     return 0;
 }
 
+int Board::getBestHeuristic(Move *move, Side side)
+{
+    int i = move->getX();
+    int j = move->getY();
+
+    Side other;
+    Board *testBoard = copy();
+
+    if (side == BLACK)
+        other = WHITE;
+    else
+        other = BLACK;
+
+    testBoard->doMove(move, side);
+
+    int val = count(side) - count(other);
+
+    if ((i == 0 || i == 7) && (j == 0 || j == 7))
+        return 3*val;
+    else if ((i == 1 || i == 6) && (j == 1 || j == 6))
+        return -3*val;
+    else if (((j == 0 || j == 7) && (i == 1 || i == 6)) ||
+             ((i == 0 || i == 7) && (j == 1 || j == 6)))
+        return -1*val; 
+    else if (i == 0 || i == 7 || j == 0 || j == 7)
+        return 1*val;
+    return 0;
+}
+
+int Board::getNaiveHeuristic(Move *move, Side side)
+{
+    Side other;
+    Board *testBoard = copy();
+
+    if (side == BLACK)
+        other = WHITE;
+    else
+        other = BLACK;
+
+    testBoard->doMove(move, side);
+    
+    int value = count(side) - count(other);
+
+    return value;
+}
+
 /*
  * Sets the board state given an 8x8 char array where 'w' indicates a white
  * piece and 'b' indicates a black piece. Mainly for testing purposes.
