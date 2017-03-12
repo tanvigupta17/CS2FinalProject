@@ -59,7 +59,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     // Beat SimplePlayer - use heuristics
     // move = doHeuristicMove(opponentsMove, msLeft);
 
-    // Further improve AI - use 2-ply minimax
+    // Further improve AI - use minimax
     move = doMinimaxMove(opponentsMove, msLeft);
 
     return move;
@@ -176,7 +176,7 @@ int Player::naiveMinimax(Move *move, int depth, Side side)
         if (testingMinimax)
             return test->getNaiveHeuristic(move, side);
         else
-            return test->getBestHeuristic(move, side);
+            return test->getHeuristicValue(move);//, side);
     }
 
     std::vector<int> scores;
