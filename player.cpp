@@ -154,7 +154,7 @@ Move *Player::doMinimaxMove(Move *opponentsMove, int msLeft)
     if (testingMinimax)
         score = naiveMinimax(opponentsMove, 2, opponentsSide);
     else
-        score = naiveMinimax(opponentsMove, 7, opponentsSide);
+        score = naiveMinimax(opponentsMove, 5, opponentsSide);
 
     if (bestMove != nullptr)
         aiBoard->doMove(bestMove, aiSide);
@@ -167,7 +167,7 @@ int Player::naiveMinimax(Move *move, int depth, Side side)
     // Make current move to test cases
     test->doMove(move, side);
 
-    Board *originalTest = test;
+    Board *originalTest = test->copy();
 
     // Base case for recursion - no possible moves or reached depth needed
     if (test->isDone() || depth <= 0)
@@ -192,16 +192,20 @@ int Player::naiveMinimax(Move *move, int depth, Side side)
     // Get possible moves for other player (side has been switched)
     std::vector<Move *> possibles = test->possibleMoves(side);
 
+    depth -= 1;
+
     // Find best move in possibles
     for (unsigned int i = 0; i < possibles.size(); i++)
     {
-        depth -= 1;
-        int score = -naiveMinimax(possibles[i], depth, side); //was side
+        int score = -naiveMinimax(possibles[i], depth, side);
         scores.push_back(score);
         alpha = max(alpha, score);
 
-        test = originalTest;
+        delete test;
+        test = originalTest->copy();
     }
+
+    delete originalTest;
 
     Move *oldBest = bestMove;
 

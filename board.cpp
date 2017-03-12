@@ -218,7 +218,7 @@ int Board::getBestHeuristic(Move *move, Side side)
 
     testBoard->doMove(move, side);
 
-    int val = count(side) - count(other);
+    int val = abs(count(side) - count(other));
 
     if ((i == 0 || i == 7) && (j == 0 || j == 7))
         return 10*val;
