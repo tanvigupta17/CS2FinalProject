@@ -1,6 +1,7 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
+#include <iostream>
 #include <bitset>
 #include <vector>
 #include <cmath>
@@ -12,6 +13,15 @@ class Board {
 private:
     bitset<64> black;
     bitset<64> taken;
+
+    int staticWeights[8][8] = {{4, -3, 2, 2, 2, 2, -3, 4},
+                               {-3, -4, -1, -1, -1, -1, -4, -3},
+                               {2, -1, 1, 0, 0, 1, -1, 2},
+                               {2, -1, 0, 1, 1, 0, -1, 2},
+                               {2, -1, 0, 1, 1, 0, -1, 2},
+                               {2, -1, 1, 0, 0, 1, -1, 2},
+                               {-3, -4, -1, -1, -1, -1, -4, -3},
+                               {4, -3, 2, 2, 2, 2, -3, 4}};
 
     bool occupied(int x, int y);
     bool get(Side side, int x, int y);
@@ -31,8 +41,8 @@ public:
     int countBlack();
     int countWhite();
     std::vector<Move *> possibleMoves(Side side);
-    int getHeuristicValue(Move *m);
-    int getBestHeuristic(Move *m, Side side);
+    double getStaticWeight(Side side);
+    double getHeuristicValue(Side side);
     int getNaiveHeuristic(Move *m, Side side);
 
     void setBoard(char data[]);

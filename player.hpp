@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <climits>
+#include <cfloat>
 #include "common.hpp"
 #include "board.hpp"
 using namespace std;
@@ -17,7 +18,7 @@ public:
     Move *doRandomMove(Move *opponentsMove, int msLeft);
     Move *doHeuristicMove(Move *opponentsMove, int msLeft);
     Move *doMinimaxMove(Move *opponentsMove, int msLeft);
-    int naiveMinimax(Move *move, int depth, Side side);
+    double naiveMinimax(Move *move, int depth, Side side);
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;

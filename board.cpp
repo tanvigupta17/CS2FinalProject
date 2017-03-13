@@ -163,7 +163,7 @@ int Board::countWhite() {
 }
 
 /*
- * Get vector of possible moves for given stone.
+ * Get number of possible moves for given stone.
  */
 std::vector<Move *> Board::possibleMoves(Side side)
 {
@@ -184,52 +184,45 @@ std::vector<Move *> Board::possibleMoves(Side side)
 }
 
 /*
- * Get heuristic value of given board position to determine favorability.
+ * Get static weight of given board position as basic test of favorability.
  */
-int Board::getHeuristicValue(Move *move)
+double Board::getStaticWeight(Side side)
 {
-    int i = move->getX();
-    int j = move->getY();
+    int aiScore = 0;
+    int oppScore = 0;
 
-    if ((i == 0 || i == 7) && (j == 0 || j == 7))
-        return 3;
-    else if ((i == 1 || i == 6) && (j == 1 || j == 6))
-        return -3;
-    else if (((j == 0 || j == 7) && (i == 1 || i == 6)) ||
-             ((i == 0 || i == 7) && (j == 1 || j == 6)))
-        return -1;
-    else if (i == 0 || i == 7 || j == 0 || j == 7)
-        return 1;
-    return 0;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (get(side, i, j))
+                aiScore += staticWeights[i][j];
+            else if (occupied(i, j))
+                oppScore += staticWeights[i][j];
+        }
+    }
+    return (double) (aiScore - oppScore);
 }
 
-int Board::getBestHeuristic(Move *move, Side side)
+double Board::getHeuristicValue(Side side)
 {
-    int i = move->getX();
-    int j = move->getY();
+    Side other = (side == BLACK) ? WHITE : BLACK;
 
-    Side other;
-    Board *testBoard = copy();
+    // Calculate coin parity
+    double aiCoins = (double) count(side);
+    double oppCoins = (double) count(other);
+    double coinVal = 100 * (aiCoins - oppCoins) / (aiCoins + oppCoins);
 
-    if (side == BLACK)
-        other = WHITE;
-    else
-        other = BLACK;
+    // Calculate actual mobility
+    double aiMoves = (double) possibleMoves(side).size();
+    double oppMoves = (double) possibleMoves(other).size();
+    double mobVal = 0;
+    if ((aiMoves + oppMoves) != 0)
+        mobVal = 100 * (aiMoves - oppMoves) / (aiMoves + oppMoves);
 
-    testBoard->doMove(move, side);
+    double score = getStaticWeight(side) * ((coinVal * 25) + (mobVal * 10));
 
-    int val = abs(count(side) - count(other));
-
-    if ((i == 0 || i == 7) && (j == 0 || j == 7))
-        return 10*val;
-    else if ((i == 1 || i == 6) && (j == 1 || j == 6))
-        return 0*val;
-    else if (((j == 0 || j == 7) && (i == 1 || i == 6)) ||
-             ((i == 0 || i == 7) && (j == 1 || j == 6)))
-        return 2*val; 
-    else if (i == 0 || i == 7 || j == 0 || j == 7)
-        return 8*val;
-    return 5;
+    return score;
 }
 
 int Board::getNaiveHeuristic(Move *move, Side side)
