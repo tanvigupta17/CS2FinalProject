@@ -156,6 +156,14 @@ Move *Player::doMinimaxMove(Move *opponentsMove, int msLeft)
     // Populate board with opponent's move
     aiBoard->doMove(opponentsMove, opponentsSide);
 
+    // Determine depth to search to
+    int depth;
+    if (aiSide == BLACK)
+        depth = 4;
+    else
+        depth = 5;
+
+
     if (testingMinimax)
         score = negamax(opponentsMove, 2, opponentsSide, -DBL_MAX, DBL_MAX);
     else
@@ -218,7 +226,8 @@ double Player::negamax(Move *move, int depth, Side side, double alpha, double be
 
     Move *oldBest = bestMove;
 
-    for (unsigned int j = 0; j < scores.size(); j++)
+    unsigned int j;
+    for (j = 0; j < scores.size(); j++)
     {
         if (scores[j] == best)
         {
@@ -226,6 +235,13 @@ double Player::negamax(Move *move, int depth, Side side, double alpha, double be
             break;
         }
     }
+
+    for (unsigned int k = 0; k < possibles.size(); k++)
+    {
+        if (k != j)
+            delete possibles[k];
+    }
+    possibles.clear();
 
     if (bestMove == oldBest)
         bestMove = nullptr;

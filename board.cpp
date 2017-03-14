@@ -327,7 +327,7 @@ double Board::getHeuristicValue(Side side)
         frontVal = 100 * (- aiFront + oppFront) / (aiFront + oppFront);
 
     // Calculate final heuristic
-    double score = getStaticWeight(side) * ((frontVal * 25) + (cornerVal * 30) + (coinVal * 25) + (mobVal * 10));
+    double score = getStaticWeight(side) * ((frontVal * 25) + (cornerVal * 35) + (coinVal * 25) + (mobVal * 10));
 
     return score;
 }
