@@ -157,9 +157,9 @@ Move *Player::doMinimaxMove(Move *opponentsMove, int msLeft)
     aiBoard->doMove(opponentsMove, opponentsSide);
 
     if (testingMinimax)
-        score = naiveMinimax(opponentsMove, 2, opponentsSide);
+        score = negamax(opponentsMove, 2, opponentsSide, -DBL_MAX, DBL_MAX);
     else
-        score = naiveMinimax(opponentsMove, 4, opponentsSide);
+        score = negamax(opponentsMove, 4, opponentsSide, -DBL_MAX, DBL_MAX);
 
     if (bestMove != nullptr)
         aiBoard->doMove(bestMove, aiSide);
@@ -167,7 +167,7 @@ Move *Player::doMinimaxMove(Move *opponentsMove, int msLeft)
     return bestMove;
 }
 
-double Player::naiveMinimax(Move *move, int depth, Side side)
+double Player::negamax(Move *move, int depth, Side side, double alpha, double beta)
 {
     // Make current move to test cases
     test->doMove(move, side);
@@ -186,7 +186,7 @@ double Player::naiveMinimax(Move *move, int depth, Side side)
 
     std::vector<double> scores;
 
-    double alpha = -DBL_MAX;
+    double best = -DBL_MAX;
 
     // Switch side
     if (side == BLACK)
@@ -202,12 +202,16 @@ double Player::naiveMinimax(Move *move, int depth, Side side)
     // Find best move in possibles
     for (unsigned int i = 0; i < possibles.size(); i++)
     {
-        double score = -naiveMinimax(possibles[i], depth, side);
+        double score = -negamax(possibles[i], depth, side, -beta, -alpha);
         scores.push_back(score);
+        best = max(best, score);
         alpha = max(alpha, score);
 
         delete test;
         test = originalTest->copy();
+
+        if (alpha >= beta)
+            break;
     }
 
     delete originalTest;
@@ -216,7 +220,7 @@ double Player::naiveMinimax(Move *move, int depth, Side side)
 
     for (unsigned int j = 0; j < scores.size(); j++)
     {
-        if (scores[j] == alpha)
+        if (scores[j] == best)
         {
             bestMove = possibles[j];
             break;
@@ -226,5 +230,5 @@ double Player::naiveMinimax(Move *move, int depth, Side side)
     if (bestMove == oldBest)
         bestMove = nullptr;
 
-    return alpha;
+    return best;
 }

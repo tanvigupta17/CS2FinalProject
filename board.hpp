@@ -40,6 +40,9 @@ public:
     int count(Side side);
     int countBlack();
     int countWhite();
+    int fourCorners(Side side);
+    int cornerCloseness(Side side);
+    int frontierDiscs(Side side);
     std::vector<Move *> possibleMoves(Side side);
     double getStaticWeight(Side side);
     double getHeuristicValue(Side side);

@@ -163,7 +163,87 @@ int Board::countWhite() {
 }
 
 /*
- * Get number of possible moves for given stone.
+ * Current count of corner stones for given side
+ */
+int Board::fourCorners(Side side)
+{
+    int count = 0;
+
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            if (get(side, (i*7), (j*7)))
+                count += 1;
+        }
+    }
+    return count;
+}
+
+/*
+ * Count of potential corner stones for given side
+ */
+
+/*
+ * Current count of stones adjacent to corner for given side
+ */
+int Board::cornerCloseness(Side side)
+{
+    int count = 0;
+    for (int i = 0; i < 8; i+=7)
+    {
+        for (int j = 1; j < 7; j+=5)
+        {
+            if (get(side, i, j))
+                count += 1;
+        }
+    }
+
+    for (int i = 1; i < 7; i+=5)
+    {
+        for (int j = 0; j < 8; j+=7)
+        {
+            if (get (side, i, j))
+                count += 1;
+        }
+    }
+    return count;
+}
+
+/*
+ * Count of "frontier discs" for given side
+ */
+int Board::frontierDiscs(Side side)
+{
+    int count = 0;
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (get(side, i, j))
+            {
+                for (int k = -1; k < 2; k++)
+                {
+                    for (int l = -1; l < 2; l++)
+                    {
+                        if (onBoard((i+k), (j+l)) && 
+                            !occupied((i+k), (j+l)))
+                        {
+                            count += 1;
+                            goto loop;
+                        }
+                    }
+                }
+            }
+            loop: ;
+        }
+    }
+    return count;
+}
+
+/*
+ * Get vector of possible moves for given stone.
  */
 std::vector<Move *> Board::possibleMoves(Side side)
 {
@@ -204,6 +284,9 @@ double Board::getStaticWeight(Side side)
     return (double) (aiScore - oppScore);
 }
 
+/*
+ * Get heuristic for current board state
+ */
 double Board::getHeuristicValue(Side side)
 {
     Side other = (side == BLACK) ? WHITE : BLACK;
@@ -220,7 +303,31 @@ double Board::getHeuristicValue(Side side)
     if ((aiMoves + oppMoves) != 0)
         mobVal = 100 * (aiMoves - oppMoves) / (aiMoves + oppMoves);
 
-    double score = getStaticWeight(side) * ((coinVal * 25) + (mobVal * 10));
+    // Calculate 4-corners
+    double aiCorner = (double) fourCorners(side);
+    double oppCorner = (double) fourCorners(other);
+    double cornerVal = 0;
+    if ((aiCorner + oppCorner) != 0)
+        cornerVal = 100 * (aiCorner - oppCorner) / (aiCorner + oppCorner);
+
+    // Calculate corner closeness - not being used currently
+    /*
+    double aiClose = (double) cornerCloseness(side);
+    double oppClose = (double) cornerCloseness(other);
+    double closeVal = 0;
+    if ((aiClose + oppClose) != 0)
+        closeVal = 100 * (- aiClose + oppClose) / (aiClose + oppClose);
+    */
+
+    // Calculate frontier discs
+    double aiFront = (double) frontierDiscs(side);
+    double oppFront = (double) frontierDiscs(other);
+    double frontVal = 0;
+    if ((aiFront + oppFront) != 0)
+        frontVal = 100 * (- aiFront + oppFront) / (aiFront + oppFront);
+
+    // Calculate final heuristic
+    double score = getStaticWeight(side) * ((frontVal * 25) + (cornerVal * 30) + (coinVal * 25) + (mobVal * 10));
 
     return score;
 }

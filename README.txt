@@ -15,4 +15,9 @@ Heuristic Evaluations:
 - Tested multiple weights to determine how much importance to give to each heuristic, decided on 25 for coin parity and 10 for mobility.
 - Final heuristic value calculated with product of heuristic score and static weight of the board.
 
+
+References:
+- https://groups.google.com/forum/#!topic/comp.ai.games/WZeBxfkzfYY
+- http://www.pressibus.org/ataxx/autre/minimax/node3.html
+- https://courses.cs.washington.edu/courses/cse573/04au/Project/mini1/RUSSIA/Final_Paper.pdf
  */
